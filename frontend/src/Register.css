@@ -1,0 +1,157 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.register-container {
+  min-height: 100vh;
+  display: flex;
+  background: #f8f8ff;
+}
+
+.left-panel {
+  width: 50%;
+  padding: 50px 70px;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo h2 {
+  color: #5b3df5;
+  margin-bottom: 60px;
+}
+
+.left-panel h1 {
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.left-panel h1 span {
+  color: #5b3df5;
+}
+
+.subtitle {
+  margin-top: 20px;
+  font-size: 22px;
+  color: #555;
+  max-width: 500px;
+}
+
+.feature {
+  display: flex;
+  gap: 15px;
+  margin-top: 35px;
+}
+
+.icon {
+  width: 55px;
+  height: 55px;
+  border-radius: 12px;
+  background: #eee8ff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+}
+
+.feature h3 {
+  margin-bottom: 5px;
+}
+
+.feature p {
+  color: #666;
+}
+
+.illustration {
+  width: 500px;
+  margin-top: auto;
+}
+
+.form-panel {
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.form-card {
+  width: 700px;
+  background: white;
+  border-radius: 24px;
+  padding: 50px;
+  box-shadow: 0 5px 20px rgba(0,0,0,.08);
+}
+
+.form-card h1 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.form-card p {
+  text-align: center;
+  color: #666;
+  margin-bottom: 25px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin-top: 15px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+input {
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 15px;
+}
+
+.register-btn {
+  margin-top: 25px;
+  padding: 16px;
+  border: none;
+  border-radius: 10px;
+  background: #5b3df5;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.divider {
+  text-align: center;
+  margin: 25px 0;
+  color: #666;
+}
+
+.social-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.social-buttons button {
+  flex: 1;
+  padding: 14px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+}
+
+.login-link {
+  margin-top: 25px;
+  text-align: center;
+}
+
+.login-link span {
+  color: #5b3df5;
+  font-weight: 600;
+  cursor: pointer;
+}
