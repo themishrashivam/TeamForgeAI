@@ -47,7 +47,7 @@ function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f8fc] flex">
+    <div className="min-h-screen bg-[#f7f8fc] dark:bg-gray-900 text-black dark:text-white flex" >
       <Sidebar />
 
       <div className="flex-1 md:ml-64">

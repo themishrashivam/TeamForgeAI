@@ -6,7 +6,6 @@ import {
 } from "react-icons/fa";
 
 function BadgesCard({ user }) {
-
   const badges = [
     {
       title: "TeamForge Member",
@@ -30,33 +29,49 @@ function BadgesCard({ user }) {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-
+    <div
+      className="
+        bg-white
+        dark:bg-slate-800
+        rounded-2xl
+        border
+        border-gray-100
+        dark:border-slate-700
+        shadow-sm
+        p-6
+      "
+    >
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
-
         <div className="flex items-center gap-3">
-          <FaShieldAlt className="text-violet-600" />
+          <FaShieldAlt className="text-violet-600 text-lg" />
 
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
             Badges
           </h2>
         </div>
 
-        <button className="text-violet-600 font-medium hover:text-violet-700">
+        <button className="text-violet-600 font-medium hover:text-violet-700 transition">
           View All
         </button>
-
       </div>
 
-      {/* Badges */}
-
-      <div className="grid grid-cols-3 gap-6">
-
+      {/* Badges Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {badges.map((badge, index) => (
           <div
             key={index}
-            className="flex flex-col items-center text-center"
+            className="
+              flex
+              flex-col
+              items-center
+              text-center
+              p-4
+              rounded-2xl
+              hover:bg-gray-50
+              dark:hover:bg-slate-700
+              transition
+            "
           >
             <div
               className={`
@@ -76,15 +91,12 @@ function BadgesCard({ user }) {
               {badge.icon}
             </div>
 
-            <h3 className="mt-4 font-semibold text-gray-800">
+            <h3 className="mt-4 font-semibold text-gray-800 dark:text-white">
               {badge.title}
             </h3>
-
           </div>
         ))}
-
       </div>
-
     </div>
   );
 }

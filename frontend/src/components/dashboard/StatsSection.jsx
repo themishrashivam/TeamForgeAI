@@ -16,7 +16,7 @@ function StatsSection({ statsData, user }) {
       count: statsData?.totalProjects || 0,
       subtitle: "Your Projects",
       icon: <FaFolder />,
-      bg: "bg-violet-100",
+      bg: "bg-violet-100 dark:bg-violet-900/30",
       color: "text-violet-600",
     },
     {
@@ -24,7 +24,7 @@ function StatsSection({ statsData, user }) {
       count: statsData?.totalTeamMembers || 0,
       subtitle: "Across all projects",
       icon: <FaUsers />,
-      bg: "bg-green-100",
+      bg: "bg-green-100 dark:bg-green-900/30",
       color: "text-green-600",
     },
     {
@@ -32,7 +32,7 @@ function StatsSection({ statsData, user }) {
       count: statsData?.requestsSent || 0,
       subtitle: "Join Requests Sent",
       icon: <FaPaperPlane />,
-      bg: "bg-orange-100",
+      bg: "bg-orange-100 dark:bg-orange-900/30",
       color: "text-orange-500",
     },
     {
@@ -40,21 +40,49 @@ function StatsSection({ statsData, user }) {
       count: statsData?.requestsReceived || 0,
       subtitle: "Pending Requests",
       icon: <FaUserPlus />,
-      bg: "bg-blue-100",
+      bg: "bg-blue-100 dark:bg-blue-900/30",
       color: "text-blue-500",
     },
   ];
 
   return (
-    <div className="bg-white rounded-3xl p-4 sm:p-6 shadow-sm">
+    <div
+      className="
+        bg-white
+        dark:bg-slate-800
+        rounded-3xl
+        p-4
+        sm:p-6
+        shadow-sm
+        border
+        border-gray-200
+        dark:border-slate-700
+      "
+    >
       {/* Header */}
       <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight">
+          <h1
+            className="
+              text-3xl
+              sm:text-4xl
+              font-bold
+              text-gray-900
+              dark:text-white
+            "
+          >
             Welcome back, {user?.name || "User"}! 👋
           </h1>
 
-          <p className="text-gray-500 mt-2 text-sm sm:text-base">
+          <p
+            className="
+              text-gray-500
+              dark:text-gray-300
+              mt-2
+              text-sm
+              sm:text-base
+            "
+          >
             Let's build something amazing together today.
           </p>
         </div>
@@ -83,21 +111,25 @@ function StatsSection({ statsData, user }) {
           <div
             key={index}
             className="
+              bg-white
+              dark:bg-slate-800
               border
+              border-gray-200
+              dark:border-slate-700
               rounded-2xl
               p-5
-              hover:shadow-md
+              hover:shadow-lg
               transition
             "
           >
             <div
               className={`
-                w-12 h-12 sm:w-14 sm:h-14
+                w-14 h-14
                 rounded-xl
                 flex
                 items-center
                 justify-center
-                text-xl sm:text-2xl
+                text-2xl
                 ${item.bg}
                 ${item.color}
               `}
@@ -105,15 +137,36 @@ function StatsSection({ statsData, user }) {
               {item.icon}
             </div>
 
-            <h2 className="text-3xl sm:text-4xl font-bold mt-5">
+            <h2
+              className="
+                text-4xl
+                font-bold
+                mt-5
+                text-gray-900
+                dark:text-white
+              "
+            >
               {item.count}
             </h2>
 
-            <p className="font-medium mt-2">
+            <p
+              className="
+                font-semibold
+                mt-2
+                text-gray-800
+                dark:text-gray-100
+              "
+            >
               {item.title}
             </p>
 
-            <p className="text-gray-500 text-sm">
+            <p
+              className="
+                text-sm
+                text-gray-500
+                dark:text-gray-400
+              "
+            >
               {item.subtitle}
             </p>
           </div>

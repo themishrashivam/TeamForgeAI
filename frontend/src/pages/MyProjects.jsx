@@ -13,8 +13,7 @@ function MyProjects() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [showCreateModal, setShowCreateModal] =
-    useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -87,14 +86,34 @@ function MyProjects() {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center">
+      <div
+        className="
+        h-screen
+        flex
+        items-center
+        justify-center
+        bg-[#f8f9fc]
+        dark:bg-slate-900
+        text-gray-900
+        dark:text-white
+      "
+      >
         Loading...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] flex">
+    <div
+      className="
+            min-h-screen
+            bg-[#f8f9fc]
+            dark:bg-slate-900
+            text-gray-900
+            dark:text-white
+            flex
+          "
+    >
       <Sidebar />
 
       <div className="flex-1 md:ml-64">
@@ -104,19 +123,17 @@ function MyProjects() {
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
                 My Projects
               </h1>
 
-              <p className="text-gray-500 mt-2">
+              <p className="text-gray-500 dark:text-gray-300 mt-2">
                 Manage and track your projects
               </p>
             </div>
 
             <button
-              onClick={() =>
-                setShowCreateModal(true)
-              }
+              onClick={() => setShowCreateModal(true)}
               className="
                 w-full
                 sm:w-auto
@@ -139,16 +156,15 @@ function MyProjects() {
               {projects.map((project) => (
                 <div
                   key={project._id}
-                  onClick={() =>
-                    navigate(
-                      `/project/${project._id}`
-                    )
-                  }
+                  onClick={() => navigate(`/project/${project._id}`)}
                   className="
                     bg-white
+                    dark:bg-slate-800
                     rounded-2xl
                     overflow-hidden
                     border
+                    border-gray-200
+                    dark:border-slate-700
                     cursor-pointer
                     hover:shadow-lg
                     transition
@@ -169,55 +185,54 @@ function MyProjects() {
 
                   <div className="p-5">
                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                      <h2 className="text-xl font-bold">
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                         {project.title}
                       </h2>
 
                       <span
                         className="
-                          px-3
-                          py-1
-                          bg-green-100
-                          text-green-700
-                          rounded-full
-                          text-sm
-                          w-fit
-                        "
+                            px-3
+                            py-1
+                            bg-green-100
+                            dark:bg-green-900/30
+                            text-green-700
+                            dark:text-green-300
+                            rounded-full
+                            text-sm
+                            w-fit
+                          "
                       >
-                        {project.status ||
-                          "Active"}
+                        {project.status || "Active"}
                       </span>
                     </div>
 
-                    <p className="text-gray-600 mt-3 line-clamp-3">
+                    <p className="text-gray-600 dark:text-gray-300 mt-3 line-clamp-3">
                       {project.description}
                     </p>
 
                     <div className="flex flex-wrap gap-2 mt-4">
-                      {project.requiredSkills?.map(
-                        (skill, index) => (
-                          <span
-                            key={index}
-                            className="
-                              px-3
-                              py-1
-                              bg-violet-100
-                              text-violet-700
-                              rounded-full
-                              text-sm
-                            "
-                          >
-                            {skill}
-                          </span>
-                        )
-                      )}
+                      {project.requiredSkills?.map((skill, index) => (
+                        <span
+                          key={index}
+                          className="
+                            px-3
+                            py-1
+                            bg-violet-100
+                            dark:bg-violet-900/30
+                            text-violet-700
+                            dark:text-violet-300
+                            rounded-full
+                            text-sm
+                          "
+                        >
+                          {skill}
+                        </span>
+                      ))}
                     </div>
 
                     <div className="mt-5 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                      <span className="text-sm text-gray-500">
-                        Team Members :{" "}
-                        {project.teamMembers
-                          ?.length || 0}
+                      <span className="text-sm text-gray-500 dark:text-gray-300">
+                        Team Members : {project.teamMembers?.length || 0}
                       </span>
 
                       <button
@@ -241,17 +256,22 @@ function MyProjects() {
           ) : (
             <div
               className="
-                bg-white
-                rounded-2xl
-                p-8 md:p-10
-                text-center
-              "
+    bg-white
+    dark:bg-slate-800
+    border
+    border-gray-200
+    dark:border-slate-700
+    rounded-2xl
+    p-8
+    md:p-10
+    text-center
+  "
             >
-              <h2 className="text-xl md:text-2xl font-bold">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
                 No Projects Yet
               </h2>
 
-              <p className="text-gray-500 mt-2">
+              <p className="text-gray-500 dark:text-gray-300 mt-2">
                 Create your first project.
               </p>
             </div>
@@ -261,9 +281,7 @@ function MyProjects() {
 
       {showCreateModal && (
         <CreateProjectModal
-          onClose={() =>
-            setShowCreateModal(false)
-          }
+          onClose={() => setShowCreateModal(false)}
           onProjectCreated={fetchProjects}
         />
       )}

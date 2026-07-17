@@ -8,7 +8,6 @@ import {
 import { SiMongodb, SiExpress } from "react-icons/si";
 
 function SkillsCard({ skills = [] }) {
-
   const getSkillData = (skill) => {
     const skillMap = {
       React: {
@@ -29,12 +28,12 @@ function SkillsCard({ skills = [] }) {
       Express: {
         icon: <SiExpress />,
         level: 80,
-        color: "bg-gray-700",
+        color: "bg-gray-700 dark:bg-gray-400",
       },
       "Express.js": {
         icon: <SiExpress />,
         level: 80,
-        color: "bg-gray-700",
+        color: "bg-gray-700 dark:bg-gray-400",
       },
       MongoDB: {
         icon: <SiMongodb />,
@@ -73,13 +72,23 @@ function SkillsCard({ skills = [] }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-
+    <div
+      className="
+        bg-white
+        dark:bg-slate-800
+        rounded-2xl
+        border
+        border-gray-100
+        dark:border-slate-700
+        shadow-sm
+        p-6
+      "
+    >
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
         <span className="text-2xl">🚀</span>
 
-        <h2 className="text-2xl font-bold text-gray-900">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
           Skills
         </h2>
       </div>
@@ -87,32 +96,47 @@ function SkillsCard({ skills = [] }) {
       {/* Skills List */}
       {skills.length > 0 ? (
         <div className="space-y-6">
-
           {skills.map((skill, index) => {
             const skillData = getSkillData(skill);
 
             return (
-              <div key={index}>
-
-                <div className="flex justify-between items-center mb-2">
-
+              <div
+                key={index}
+                className="
+                  p-3
+                  rounded-xl
+                  hover:bg-gray-50
+                  dark:hover:bg-slate-700
+                  transition
+                "
+              >
+                <div className="flex justify-between items-center mb-3">
                   <div className="flex items-center gap-3">
                     <span className="text-xl text-violet-600">
                       {skillData.icon}
                     </span>
 
-                    <span className="font-medium text-gray-700">
+                    <span className="font-medium text-gray-700 dark:text-gray-200">
                       {skill}
                     </span>
                   </div>
 
-                  <span className="text-sm font-semibold text-gray-500">
+                  <span className="text-sm font-semibold text-gray-500 dark:text-gray-300">
                     {skillData.level}%
                   </span>
-
                 </div>
 
-                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                {/* Progress Bar */}
+                <div
+                  className="
+                    w-full
+                    bg-gray-200
+                    dark:bg-slate-700
+                    rounded-full
+                    h-3
+                    overflow-hidden
+                  "
+                >
                   <div
                     className={`h-full rounded-full ${skillData.color}`}
                     style={{
@@ -120,20 +144,17 @@ function SkillsCard({ skills = [] }) {
                     }}
                   />
                 </div>
-
               </div>
             );
           })}
-
         </div>
       ) : (
         <div className="text-center py-8">
-          <p className="text-gray-500">
+          <p className="text-gray-500 dark:text-gray-400">
             No skills added yet
           </p>
         </div>
       )}
-
     </div>
   );
 }

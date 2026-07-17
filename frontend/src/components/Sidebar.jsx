@@ -64,16 +64,19 @@ function Sidebar() {
       <button
         onClick={() => setIsOpen(true)}
         className="
-          md:hidden
-          fixed
-          top-4
-          left-4
-          z-[100]
-          bg-white
-          p-3
-          rounded-xl
-          shadow-md
-        "
+            md:hidden
+            fixed
+            top-4
+            left-4
+            z-[100]
+            bg-white
+            dark:bg-gray-800
+            text-black
+            dark:text-white
+            p-3
+            rounded-xl
+            shadow-md
+          "
       >
         <FaBars size={20} />
       </button>
@@ -95,23 +98,26 @@ function Sidebar() {
       {/* Sidebar */}
       <div
         className={`
-          fixed left-0 top-0
-          w-64
-          bg-white
-          min-h-screen
-          flex flex-col
-          shadow-sm
-          z-[95]
-          transform transition-transform duration-300
+                fixed left-0 top-0
+                w-64
+                bg-white
+                dark:bg-gray-800
+                text-black
+                dark:text-white
+                min-h-screen
+                flex flex-col
+                shadow-sm
+                z-[95]
+                transform transition-transform duration-300
 
-          ${
-            isOpen
-              ? "translate-x-0"
-              : "-translate-x-full"
-          }
+                ${
+                  isOpen
+                    ? "translate-x-0"
+                    : "-translate-x-full"
+                }
 
-          md:translate-x-0
-        `}
+                md:translate-x-0
+              `}
       >
         {/* Mobile Close */}
         <div className="md:hidden flex justify-end p-4">
@@ -125,7 +131,7 @@ function Sidebar() {
         {/* Logo */}
         <div className="px-4 lg:px-6 pb-4">
           <h1 className="text-2xl lg:text-3xl font-bold">
-            <span className="text-gray-900">
+            <span className="text-gray-900 dark:text-white">
               TeamForge
             </span>{" "}
             <span className="text-violet-600">
@@ -164,7 +170,7 @@ function Sidebar() {
                   `flex items-center gap-4 p-4 rounded-xl mb-2 transition ${
                     isActive
                       ? "bg-gradient-to-r from-violet-600 to-violet-500 text-white shadow-md"
-                      : "hover:bg-violet-50 text-gray-700"
+                      : "hover:bg-violet-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
                   }`
                 }
               >
@@ -176,14 +182,22 @@ function Sidebar() {
         </div>
 
         {/* Bottom Card */}
-        <div className="m-4 bg-violet-50 rounded-2xl p-4 hidden lg:block">
+        <div className="
+            m-4
+            bg-violet-50
+            dark:bg-gray-700
+            rounded-2xl
+            p-4
+            hidden
+            lg:block
+          ">
           <img
             src="/team-illustration.png"
             alt="Team"
             className="w-full"
           />
 
-          <h3 className="font-bold text-lg xl:text-xl mt-4 text-center">
+          <h3 className="font-bold text-lg xl:text-xl mt-4 text-center text-gray-900 dark:text-white">
             Build Great Things Together
           </h3>
 

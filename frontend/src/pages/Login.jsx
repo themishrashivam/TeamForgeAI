@@ -9,6 +9,7 @@ import {
   FaLock,
   FaEnvelope,
 } from "react-icons/fa";
+import { FaCheckCircle } from "react-icons/fa";
 import api from "../services/api";
 
 function Login() {
@@ -18,6 +19,7 @@ function Login() {
     email: "",
     password: "",
   });
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const [loading, setLoading] = useState(false);
 
@@ -39,9 +41,12 @@ function Login() {
         formData
       );
 
-      toast.success("Login Success!")
+      setShowSuccess(true);
 
-      navigate("/dashboard");
+      setTimeout(()=>{
+        navigate("/dashboard");
+      },2000);
+      
 
     } catch (error) {
       toast.error("Login Failed!")
@@ -53,7 +58,7 @@ function Login() {
   return (
     <div className="min-h-screen bg-[#f8f8ff] flex flex-col lg:flex-row">
 
-      <ToastContainer
+      {/* <ToastContainer
           position="top-right"
           autoClose={5000}
           hideProgressBar={false}
@@ -66,8 +71,31 @@ function Login() {
           theme="dark"
           transition={Bounce}
         />
-      {/* LEFT SECTION */}
+      LEFT SECTION */}
 
+      {
+  showSuccess && (
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+      <div className="bg-white p-8 rounded-2xl shadow-xl text-center w-80">
+
+        <FaCheckCircle
+          className="text-green-600 text-7xl mx-auto animate-bounce"
+        />
+
+        <h2 className="text-2xl font-bold mt-4 text-green-600">
+          Login Successful
+        </h2>
+
+        <p className="text-gray-500 mt-2">
+          Redirecting to Dashboard...
+        </p>
+
+      </div>
+
+    </div>
+  )
+}
       <div className="w-full lg:w-1/2 px-6 md:px-12 lg:px-20 py-10 flex flex-col">
 
         <div>
