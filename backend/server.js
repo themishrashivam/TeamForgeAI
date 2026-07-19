@@ -21,6 +21,14 @@ app.use(
 );
 app.use(express.json())
 app.use(cookieParser())
+
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "TeamForge AI Backend is Running 🚀"
+  });
+});
+
 app.use("/api/v1", authRoutes);
 app.use("/api/v1/search", searchRoutes);
 app.use("/api/v1", userRoutes);
@@ -29,6 +37,8 @@ app.use("/api/v1", requestRoutes);
 app.use("/api/v1", notificationRoutes);
 
 app.use("/api/v1", projectRoutes);
+
+
 
 app.listen(process.env.PORT,()=>{
     console.log("server is running");
