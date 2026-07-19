@@ -17,10 +17,11 @@ const generateToken = (id, role) => {
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, skills, bio} = req.body;
+    const { name, email, password, skills, bio } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
+        success: false,
         message: "Please fill all fields",
       });
     }
@@ -29,6 +30,7 @@ export const registerUser = async (req, res) => {
 
     if (existingUser) {
       return res.status(400).json({
+        success: false,
         message: "User already exists",
       });
     }
@@ -40,25 +42,33 @@ export const registerUser = async (req, res) => {
       email,
       password: hashedPassword,
       skills,
-      bio
+      bio,
     });
 
     const token = generateToken(user._id, user.role);
 
     res.cookie("refreshToken", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.status(201).json({
+      success: true,
       message: "User registered successfully",
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (error) {
     console.log("Register Error:", error);
 
     res.status(500).json({
+      success: false,
       message: "Internal Server Error",
     });
   }
@@ -70,6 +80,7 @@ export const loginUser = async (req, res) => {
 
     if (!email || !password) {
       return res.status(400).json({
+        success: false,
         message: "Please fill all fields",
       });
     }
@@ -78,37 +89,44 @@ export const loginUser = async (req, res) => {
 
     if (!user) {
       return res.status(401).json({
+        success: false,
         message: "Invalid Credentials",
       });
     }
 
-    const isMatch = await bcrypt.compare(
-      password,
-      user.password
-    );
+    const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(401).json({
+        success: false,
         message: "Invalid Credentials",
       });
     }
+
     const token = generateToken(user._id, user.role);
 
     res.cookie("refreshToken", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.status(200).json({
       success: true,
       message: "Login Successful",
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (error) {
     console.log("Login Error:", error);
 
     res.status(500).json({
+      success: false,
       message: "Internal Server Error",
     });
   }
@@ -118,17 +136,19 @@ export const logoutUser = async (req, res) => {
   try {
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "None",
     });
 
     res.status(200).json({
+      success: true,
       message: "Logged out successfully",
     });
   } catch (error) {
     console.log("Logout Error:", error);
 
     res.status(500).json({
+      success: false,
       message: "Internal Server Error",
     });
   }
