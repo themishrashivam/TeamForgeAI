@@ -9,7 +9,6 @@ import MyProjectsSection from "../components/dashboard/MyProjectsSection";
 import TeamInvitesSection from "../components/dashboard/TeamInvitesSection";
 import RecommendedProjectsSection from "../components/dashboard/RecommendedProjectsSection";
 import ActivityFeedSection from "../components/dashboard/ActivityFeedSection";
-import TaskBoard from "./Taskboard";
 
 function Dashboard() {
   const [user, setUser] = useState(null);
@@ -20,8 +19,6 @@ function Dashboard() {
     recommendedProjects: [],
     invites: [],
   });
-
-  const [selectedProjectId, setSelectedProjectId] = useState(null);
 
   useEffect(() => {
     fetchProfile();
@@ -41,13 +38,14 @@ function Dashboard() {
     try {
       const res = await api.get("/dashboard");
 
-      setDashboardData(res.data);
-
-      if (res.data.myProjects?.length > 0) {
-        setSelectedProjectId(res.data.myProjects[0]._id);
-      }
+      setDashboardData({
+        stats: res.data.stats || {},
+        myProjects: res.data.myProjects || [],
+        recommendedProjects: res.data.recommendedProjects || [],
+        invites: res.data.invites || [],
+      });
     } catch (error) {
-      console.log(error);
+      console.log("Dashboard Error:", error);
     }
   };
 
@@ -59,42 +57,30 @@ function Dashboard() {
         <Topbar user={user} />
 
         <div className="p-3 sm:p-4 md:p-6">
-
-          {/* Stats */}
           <StatsSection
             statsData={dashboardData.stats}
             user={user}
           />
 
-          {/* Projects + Invites */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
             <MyProjectsSection
-              projects={dashboardData.myProjects || []}
+              projects={dashboardData.myProjects}
             />
 
             <TeamInvitesSection
-              invites={dashboardData.invites || []}
+              invites={dashboardData.invites}
             />
           </div>
 
-          {/* Recommended + Activity */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
             <RecommendedProjectsSection
-              projects={dashboardData.recommendedProjects || []}
+              projects={dashboardData.recommendedProjects}
             />
 
             <ActivityFeedSection
-              projects={dashboardData.myProjects || []}
+              projects={dashboardData.myProjects}
             />
           </div>
-
-          {/* Task Board */}
-          {selectedProjectId && (
-            <div className="mt-8">
-              <TaskBoard projectId={selectedProjectId} />
-            </div>
-          )}
-
         </div>
       </div>
     </div>

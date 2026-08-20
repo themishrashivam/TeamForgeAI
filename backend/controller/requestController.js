@@ -6,6 +6,13 @@ export const sendJoinRequest = async (req, res) => {
   try {
     const { projectId } = req.body;
 
+    if (!projectId) {
+      return res.status(400).json({
+        success: false,
+        message: "Project ID is required",
+      });
+    }
+
     const project = await Project.findById(projectId);
 
     if (!project) {
@@ -15,7 +22,6 @@ export const sendJoinRequest = async (req, res) => {
       });
     }
 
-    // Owner cannot send request to own project
     if (
       project.createdBy.toString() ===
       req.user._id.toString()
@@ -26,7 +32,6 @@ export const sendJoinRequest = async (req, res) => {
       });
     }
 
-    // Already team member
     const alreadyMember = project.teamMembers?.some(
       (member) =>
         member.toString() === req.user._id.toString()
@@ -39,7 +44,6 @@ export const sendJoinRequest = async (req, res) => {
       });
     }
 
-    // Duplicate request check
     const existingRequest =
       await JoinRequest.findOne({
         project: projectId,
@@ -54,46 +58,46 @@ export const sendJoinRequest = async (req, res) => {
       });
     }
 
-    const request =
-      await JoinRequest.create({
-        project: projectId,
-        sender: req.user._id,
-        receiver: project.createdBy,
-      });
+    const request = await JoinRequest.create({
+      project: projectId,
+      sender: req.user._id,
+      receiver: project.createdBy,
+      status: "pending",
+    });
 
-    // Create notification for project owner
-    await Notification.create({
+    const notification = await Notification.create({
       user: project.createdBy,
       title: "New Join Request",
       message: `${req.user.name} wants to join ${project.title}`,
       type: "join_request",
+      isRead: false,
     });
 
-    res.status(201).json({
+    console.log("Join Request Created:", request._id);
+    console.log("Notification Created:", notification._id);
+    console.log("Notification Receiver:", notification.user);
+
+    return res.status(201).json({
       success: true,
       message: "Join request sent successfully",
       request,
+      notification,
     });
   } catch (error) {
     console.log("Send Request Error:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      message: "Server Error",
+      message: error.message,
     });
   }
 };
 
-export const getProjectRequests = async (
-  req,
-  res
-) => {
+export const getProjectRequests = async (req, res) => {
   try {
     const { projectId } = req.params;
 
-    const project = await Project.findById(
-      projectId
-    );
+    const project = await Project.findById(projectId);
 
     if (!project) {
       return res.status(404).json({
@@ -121,33 +125,25 @@ export const getProjectRequests = async (
         "name email skills bio profileImage"
       );
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       count: requests.length,
       requests,
     });
   } catch (error) {
-    console.log(
-      "Get Requests Error:",
-      error
-    );
+    console.log("Get Requests Error:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      message: "Server Error",
+      message: error.message,
     });
   }
 };
 
-export const acceptJoinRequest = async (
-  req,
-  res
-) => {
+export const acceptJoinRequest = async (req, res) => {
   try {
     const request =
-      await JoinRequest.findById(
-        req.params.id
-      );
+      await JoinRequest.findById(req.params.id);
 
     if (!request) {
       return res.status(404).json({
@@ -156,10 +152,9 @@ export const acceptJoinRequest = async (
       });
     }
 
-    const project =
-      await Project.findById(
-        request.project
-      );
+    const project = await Project.findById(
+      request.project
+    );
 
     if (!project) {
       return res.status(404).json({
@@ -175,62 +170,56 @@ export const acceptJoinRequest = async (
       return res.status(403).json({
         success: false,
         message: "Access denied",
+      });
+    }
+
+    if (request.status !== "pending") {
+      return res.status(400).json({
+        success: false,
+        message: "Request has already been processed",
       });
     }
 
     request.status = "accepted";
     await request.save();
 
-    const exists =
-      project.teamMembers.some(
-        (member) =>
-          member.toString() ===
-          request.sender.toString()
-      );
+    const exists = project.teamMembers.some(
+      (member) =>
+        member.toString() ===
+        request.sender.toString()
+    );
 
     if (!exists) {
-      project.teamMembers.push(
-        request.sender
-      );
-
+      project.teamMembers.push(request.sender);
       await project.save();
     }
 
-    // Notification to sender
     await Notification.create({
       user: request.sender,
       title: "Request Accepted",
       message: `Your request to join ${project.title} has been accepted`,
       type: "request_accepted",
+      isRead: false,
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      message:
-        "Request accepted successfully",
+      message: "Request accepted successfully",
     });
   } catch (error) {
-    console.log(
-      "Accept Request Error:",
-      error
-    );
+    console.log("Accept Request Error:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      message: "Server Error",
+      message: error.message,
     });
   }
 };
 
-export const rejectJoinRequest = async (
-  req,
-  res
-) => {
+export const rejectJoinRequest = async (req, res) => {
   try {
     const request =
-      await JoinRequest.findById(
-        req.params.id
-      );
+      await JoinRequest.findById(req.params.id);
 
     if (!request) {
       return res.status(404).json({
@@ -239,10 +228,9 @@ export const rejectJoinRequest = async (
       });
     }
 
-    const project =
-      await Project.findById(
-        request.project
-      );
+    const project = await Project.findById(
+      request.project
+    );
 
     if (!project) {
       return res.status(404).json({
@@ -261,31 +249,34 @@ export const rejectJoinRequest = async (
       });
     }
 
+    if (request.status !== "pending") {
+      return res.status(400).json({
+        success: false,
+        message: "Request has already been processed",
+      });
+    }
+
     request.status = "rejected";
     await request.save();
 
-    // Notification to sender
     await Notification.create({
       user: request.sender,
       title: "Request Rejected",
       message: `Your request to join ${project.title} has been rejected`,
       type: "request_rejected",
+      isRead: false,
     });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      message:
-        "Request rejected successfully",
+      message: "Request rejected successfully",
     });
   } catch (error) {
-    console.log(
-      "Reject Request Error:",
-      error
-    );
+    console.log("Reject Request Error:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      message: "Server Error",
+      message: error.message,
     });
   }
 };
@@ -295,37 +286,30 @@ export const getReceivedRequests = async (req, res) => {
     console.log("================================");
     console.log("Logged User ID:", req.user._id);
 
-    const requests = await JoinRequest.find({
-      receiver: req.user._id,
-      status: "pending",
-    })
-      .populate(
-        "sender",
-        "name email profileImage skills bio"
-      )
-      .populate(
-        "project",
-        "title description category"
-      );
+    const requests =
+      await JoinRequest.find({
+        receiver: req.user._id,
+        status: "pending",
+      })
+        .populate(
+          "sender",
+          "name email profileImage skills bio"
+        )
+        .populate(
+          "project",
+          "title description category"
+        );
 
     console.log(
       "Requests Found:",
       requests.length
     );
 
-    if (requests.length > 0) {
-      console.log(
-        "First Request:",
-        requests[0]
-      );
-    }
-
     return res.status(200).json({
       success: true,
       count: requests.length,
       requests,
     });
-
   } catch (error) {
     console.log(
       "Get Received Requests Error:",

@@ -1,6 +1,15 @@
 import express from "express";
 
-import {createProject,getAllProjects,getMyProjects,getSingleProject} from "../controller/projectController.js";
+import {
+  createProject,
+  getAllProjects,
+  getMyProjects,
+  getSingleProject,
+  updateProject,
+  deleteProject,
+  removeTeamMember,
+  leaveProject,
+} from "../controller/projectController.js";
 
 import { authMiddleware } from "../middleware/authMiddleware.js";
 
@@ -8,14 +17,66 @@ import { getDashboardData } from "../controller/dashboardController.js";
 
 const router = express.Router();
 
-router.get("/dashboard",authMiddleware,getDashboardData);
+// Dashboard
+router.get(
+  "/dashboard",
+  authMiddleware,
+  getDashboardData
+);
 
-router.post("/create",authMiddleware,createProject);
+// Create
+router.post(
+  "/create",
+  authMiddleware,
+  createProject
+);
 
-router.get("/all",authMiddleware,getAllProjects);
+// Get projects
+router.get(
+  "/all",
+  authMiddleware,
+  getAllProjects
+);
 
-router.get("/my",authMiddleware,getMyProjects);
+router.get(
+  "/my",
+  authMiddleware,
+  getMyProjects
+);
 
-router.get("/:id",authMiddleware,getSingleProject);
+// Edit project
+router.put(
+  "/:id",
+  authMiddleware,
+  updateProject
+);
+
+// Delete project
+router.delete(
+  "/:id",
+  authMiddleware,
+  deleteProject
+);
+
+// Remove team member
+router.delete(
+  "/:projectId/members/:userId",
+  authMiddleware,
+  removeTeamMember
+);
+
+// Leave project
+router.delete(
+  "/:projectId/leave",
+  authMiddleware,
+  leaveProject
+);
+
+// IMPORTANT: Keep this LAST
+router.get(
+  "/:id",
+  authMiddleware,
+  getSingleProject
+);
 
 export default router;

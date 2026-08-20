@@ -11,11 +11,12 @@ import projectRoutes from "./routes/projectRoutes.js";
 import requestRoutes from "./routes/requestRoutes.js";
 import searchRoutes from "./routes/searchRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
-import taskRoutes from "./routes/taskRoutes.js"; // ✅ New Import
+import taskRoutes from "./routes/taskRoutes.js";
 
 dotenv.config();
 
 const app = express();
+
 dbconnect();
 
 app.use(
@@ -27,6 +28,7 @@ app.use(
 
 app.use(express.json());
 app.use(cookieParser());
+
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
@@ -36,11 +38,15 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1", authRoutes);
 app.use("/api/v1", userRoutes);
-app.use("/api/v1", projectRoutes);
+
+app.use("/api/v1", notificationRoutes);
+
 app.use("/api/v1", requestRoutes);
 app.use("/api/v1/search", searchRoutes);
-app.use("/api/v1", notificationRoutes);
-app.use("/api/v1/tasks", taskRoutes); // ✅ Task Routes
+
+app.use("/api/v1", projectRoutes);
+
+app.use("/api/v1/tasks", taskRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
