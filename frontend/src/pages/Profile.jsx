@@ -17,6 +17,7 @@ import api from "../services/api";
 function Profile() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -26,27 +27,68 @@ function Profile() {
     try {
       const res = await api.get("/profile");
 
-      console.log(
-        "Profile Response:",
-        res.data
-      );
+      console.log("Profile Response:", res.data);
 
       setUser(res.data.user);
     } catch (error) {
       console.log(
         "Profile Error:",
-        error.response?.data ||
-          error.message
+        error.response?.data || error.message
       );
     } finally {
       setLoading(false);
     }
   };
 
+  const updateProfile = async (updatedData) => {
+    try {
+      setSaving(true);
+
+      const res = await api.put(
+        "/profile",
+        updatedData
+      );
+
+      console.log(
+        "Updated Profile:",
+        res.data
+      );
+
+      if (res.data.user) {
+        setUser(res.data.user);
+      } else if (res.data.data) {
+        setUser(res.data.data);
+      } else {
+        await fetchProfile();
+      }
+
+      return {
+        success: true,
+        message:
+          res.data.message ||
+          "Profile updated successfully",
+      };
+    } catch (error) {
+      console.log(
+        "Update Profile Error:",
+        error.response?.data || error.message
+      );
+
+      return {
+        success: false,
+        message:
+          error.response?.data?.message ||
+          "Unable to update profile",
+      };
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gray-50">
-        <h2 className="text-xl font-semibold">
+      <div className="h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900">
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
           Loading Profile...
         </h2>
       </div>
@@ -55,7 +97,7 @@ function Profile() {
 
   if (!user) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gray-50">
+      <div className="h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900">
         <h2 className="text-xl font-semibold text-red-500">
           Profile Not Found
         </h2>
@@ -64,56 +106,68 @@ function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] flex">
-      {/* Sidebar */}
+    <div className="min-h-screen bg-[#f8f9fc] dark:bg-slate-900 flex">
       <Sidebar />
 
-      {/* Main Content */}
       <div className="flex-1 md:ml-64">
-        {/* Topbar */}
         <Topbar user={user} />
 
         <div className="p-3 sm:p-4 md:p-6 space-y-6">
-          {/* Profile Header */}
-          <ProfileHeader user={user} />
+          <ProfileHeader
+            user={user}
+            onUpdate={updateProfile}
+            saving={saving}
+          />
 
-          {/* Main Layout */}
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-            {/* Left Column */}
             <div className="xl:col-span-4 space-y-6">
-              <AboutCard user={user} />
+              <AboutCard
+                user={user}
+                onUpdate={updateProfile}
+                saving={saving}
+              />
 
               <BioCard
                 bio={user.bio}
+                user={user}
+                onUpdate={updateProfile}
+                saving={saving}
               />
             </div>
 
-            {/* Center Column */}
             <div className="xl:col-span-5 space-y-6">
               <SkillsCard
-                skills={
-                  user.skills || []
-                }
+                skills={user.skills || []}
+                user={user}
+                onUpdate={updateProfile}
+                saving={saving}
               />
 
               <EducationCard
-                education={
-                  user.education || []
-                }
+                education={user.education || []}
+                user={user}
+                onUpdate={updateProfile}
+                saving={saving}
               />
 
-              <ActivityCard />
+              <ActivityCard
+                user={user}
+              />
             </div>
 
-            {/* Right Column */}
             <div className="xl:col-span-3 space-y-6">
               <TopSkillsCard
-                skills={
-                  user.skills || []
-                }
+                skills={user.skills || []}
+                user={user}
+                onUpdate={updateProfile}
+                saving={saving}
               />
 
-              <BadgesCard />
+              <BadgesCard
+                user={user}
+                onUpdate={updateProfile}
+                saving={saving}
+              />
             </div>
           </div>
         </div>

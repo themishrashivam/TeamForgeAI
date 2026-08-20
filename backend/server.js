@@ -12,6 +12,7 @@ import requestRoutes from "./routes/requestRoutes.js";
 import searchRoutes from "./routes/searchRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
+import messageRoutes from "./routes/messageRoutes.js";
 
 dotenv.config();
 
@@ -38,20 +39,18 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1", authRoutes);
 app.use("/api/v1", userRoutes);
-
 app.use("/api/v1", notificationRoutes);
-
 app.use("/api/v1", requestRoutes);
 app.use("/api/v1/search", searchRoutes);
-
 app.use("/api/v1", projectRoutes);
-
 app.use("/api/v1/tasks", taskRoutes);
+app.use("/api/v1/messages", messageRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
     success: false,
     message: "API Route Not Found",
+    path: req.originalUrl,
   });
 });
 

@@ -8,52 +8,80 @@ import { SiMongodb, SiExpress } from "react-icons/si";
 
 function TopSkillsCard({ skills = [] }) {
   const getSkillInfo = (skill) => {
+    const normalizedSkill = skill
+      ?.trim()
+      .toLowerCase();
+
     const skillMap = {
-      React: {
+      react: {
         icon: <FaReact />,
         color: "text-blue-500",
       },
-      "React.js": {
+      "react.js": {
         icon: <FaReact />,
         color: "text-blue-500",
       },
-      "Node.js": {
+      "node.js": {
         icon: <FaNodeJs />,
         color: "text-green-500",
       },
-      Express: {
+      node: {
+        icon: <FaNodeJs />,
+        color: "text-green-500",
+      },
+      express: {
         icon: <SiExpress />,
         color: "text-gray-700 dark:text-gray-300",
       },
-      "Express.js": {
+      "express.js": {
         icon: <SiExpress />,
         color: "text-gray-700 dark:text-gray-300",
       },
-      MongoDB: {
+      mongodb: {
         icon: <SiMongodb />,
         color: "text-emerald-500",
       },
-      Java: {
+      java: {
         icon: <FaJava />,
         color: "text-orange-500",
       },
-      Git: {
+      git: {
         icon: <FaGitAlt />,
         color: "text-red-500",
       },
-      GitHub: {
+      github: {
         icon: <FaGitAlt />,
-        color: "text-red-500",
+        color: "text-gray-800 dark:text-gray-200",
       },
     };
 
     return (
-      skillMap[skill] || {
+      skillMap[normalizedSkill] || {
         icon: "🚀",
         color: "text-violet-500",
       }
     );
   };
+
+  const getSkillLevel = (index) => {
+    const levels = [
+      "Expert",
+      "Advanced",
+      "Advanced",
+      "Intermediate",
+      "Intermediate",
+    ];
+
+    return levels[index] || "Intermediate";
+  };
+
+  const topSkills = skills
+    .filter(
+      (skill) =>
+        typeof skill === "string" &&
+        skill.trim()
+    )
+    .slice(0, 5);
 
   return (
     <div
@@ -68,28 +96,32 @@ function TopSkillsCard({ skills = [] }) {
         p-6
       "
     >
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <span className="text-2xl">🔥</span>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">
+            🔥
+          </span>
 
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          Top Skills
-        </h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Top Skills
+          </h2>
+        </div>
       </div>
 
-      {/* Skills */}
-      {skills.length > 0 ? (
+      {topSkills.length > 0 ? (
         <div className="space-y-4">
-          {skills.slice(0, 5).map((skill, index) => {
-            const skillInfo = getSkillInfo(skill);
+          {topSkills.map((skill, index) => {
+            const skillInfo =
+              getSkillInfo(skill);
 
             return (
               <div
-                key={index}
+                key={`${skill}-${index}`}
                 className="
                   flex
                   items-center
                   justify-between
+                  gap-3
                   p-4
                   rounded-xl
                   bg-gray-50
@@ -99,13 +131,26 @@ function TopSkillsCard({ skills = [] }) {
                   transition
                 "
               >
-                <div className="flex items-center gap-3">
-                  <div className={`text-2xl ${skillInfo.color}`}>
+                <div className="flex items-center gap-3 min-w-0">
+                  <div
+                    className={`
+                      text-2xl
+                      flex-shrink-0
+                      ${skillInfo.color}
+                    `}
+                  >
                     {skillInfo.icon}
                   </div>
 
-                  <div>
-                    <h3 className="font-semibold text-gray-800 dark:text-white">
+                  <div className="min-w-0">
+                    <h3
+                      className="
+                        font-semibold
+                        text-gray-800
+                        dark:text-white
+                        truncate
+                      "
+                    >
                       {skill}
                     </h3>
 
@@ -117,6 +162,7 @@ function TopSkillsCard({ skills = [] }) {
 
                 <div
                   className="
+                    flex-shrink-0
                     px-3
                     py-1
                     bg-violet-100
@@ -128,7 +174,7 @@ function TopSkillsCard({ skills = [] }) {
                     font-medium
                   "
                 >
-                  Expert
+                  {getSkillLevel(index)}
                 </div>
               </div>
             );
@@ -136,8 +182,16 @@ function TopSkillsCard({ skills = [] }) {
         </div>
       ) : (
         <div className="text-center py-8">
+          <div className="text-4xl mb-3">
+            🔥
+          </div>
+
           <p className="text-gray-500 dark:text-gray-400">
             No skills added yet
+          </p>
+
+          <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
+            Add skills to your profile to see them here.
           </p>
         </div>
       )}

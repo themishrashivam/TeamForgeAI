@@ -10,6 +10,7 @@ import LandingPage from "./pages/LandingPage";
 import ProjectDetails from "./pages/ProjectDetails";
 import JoinRequests from "./pages/JoinRequests";
 import TaskBoard from "./pages/Taskboard.jsx";
+import Message from "./pages/Messages.jsx"
 
 function App() {
   return (
@@ -70,6 +71,8 @@ function App() {
           path="/requests"
           element={<JoinRequests />}
         />
+
+        <Route path="/messages" element={<Message />} />
 
         <Route
           path="/logout"
