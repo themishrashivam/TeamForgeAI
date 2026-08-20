@@ -9,7 +9,7 @@ import ExploreProjects from "./pages/ExploreProjects";
 import LandingPage from "./pages/LandingPage";
 import ProjectDetails from "./pages/ProjectDetails";
 import JoinRequests from "./pages/JoinRequests";
-import TaskBoard from "./pages/Taskboard";
+import TaskBoard from "./pages/Taskboard.jsx";
 
 function App() {
   return (
