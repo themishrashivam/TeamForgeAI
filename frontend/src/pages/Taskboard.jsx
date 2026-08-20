@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-import Sidebar from "../components/Sidebar";
-import Topbar from "../components/Topbar";
+import Sidebar from "../components/Sidebar.jsx";
+import Topbar from "../components/Topbar.jsx";
 
-import TaskColumn from "../components/tasks/TaskColumn";
-import CreateTaskModal from "../components/tasks/CreateTaskModal";
+import TaskColumn from "../components/tasks/TaskColumn.jsx";
+import CreateTaskModal from "../components/tasks/createTaskModal.jsx";
 
-import api from "../services/api";
+import api from "../services/api.js";
 
 function TaskBoard() {
     const { projectId } = useParams();
