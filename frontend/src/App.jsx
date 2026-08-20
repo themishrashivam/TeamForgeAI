@@ -9,28 +9,72 @@ import ExploreProjects from "./pages/ExploreProjects";
 import LandingPage from "./pages/LandingPage";
 import ProjectDetails from "./pages/ProjectDetails";
 import JoinRequests from "./pages/JoinRequests";
+import TaskBoard from "./pages/Taskboard";
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route
+          path="/"
+          element={<LandingPage />}
+        />
 
-             
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register"element={<Register />}/>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/profile/:userId" element={<Profile />} />
-        <Route path="/projects" element={<MyProjects />} />
-        <Route path="/explore" element={<ExploreProjects />} />
+        <Route
+          path="/login"
+          element={<Login />}
+        />
 
-        <Route path="/project/:id" element={<ProjectDetails />} />
+        <Route
+          path="/register"
+          element={<Register />}
+        />
 
-        <Route path="/profile" element={<Profile/>}/>
+        <Route
+          path="/dashboard"
+          element={<Dashboard />}
+        />
+
+        <Route
+          path="/profile"
+          element={<Profile />}
+        />
+
+        <Route
+          path="/profile/:userId"
+          element={<Profile />}
+        />
+
+        <Route
+          path="/projects"
+          element={<MyProjects />}
+        />
+
+        <Route
+          path="/explore"
+          element={<ExploreProjects />}
+        />
+
+        <Route
+          path="/project/:id"
+          element={<ProjectDetails />}
+        />
+
+
+        <Route
+          path="/tasks/:projectId"
+          element={<TaskBoard />}
+        />
+
         <Route
           path="/requests"
           element={<JoinRequests />}
         />
-        <Route path= "/logout" />
+
+        <Route
+          path="/logout"
+          element={<LandingPage />}
+        />
 
       </Routes>
     </BrowserRouter>
