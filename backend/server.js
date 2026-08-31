@@ -13,6 +13,7 @@ import searchRoutes from "./routes/searchRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
 import messageRoutes from "./routes/messageRoutes.js";
+import aiRoutes from "./ai/aiRoutes.js";
 
 dotenv.config();
 
@@ -45,6 +46,7 @@ app.use("/api/v1/search", searchRoutes);
 app.use("/api/v1", projectRoutes);
 app.use("/api/v1/tasks", taskRoutes);
 app.use("/api/v1/messages", messageRoutes);
+app.use("/api/v1/ai", aiRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

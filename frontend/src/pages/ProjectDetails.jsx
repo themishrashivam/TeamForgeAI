@@ -13,6 +13,11 @@ import {
   FaSignOutAlt,
   FaTrash,
   FaEdit,
+  FaRobot,
+  FaStar,
+  FaCheckCircle,
+  FaTimesCircle,
+  FaSyncAlt,
 } from "react-icons/fa";
 
 import Sidebar from "../components/Sidebar";
@@ -31,6 +36,12 @@ function ProjectDetails() {
   const [actionLoading, setActionLoading] = useState(false);
 
   const [showEditModal, setShowEditModal] = useState(false);
+
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState("");
+  const [recommendations, setRecommendations] = useState([]);
+  const [showRecommendations, setShowRecommendations] =
+    useState(false);
 
   const [editData, setEditData] = useState({
     title: "",
@@ -123,8 +134,11 @@ function ProjectDetails() {
       });
 
       setProject(res.data.project);
-
       setShowEditModal(false);
+
+      setRecommendations([]);
+      setShowRecommendations(false);
+      setAiError("");
 
       alert("Project updated successfully.");
     } catch (error) {
@@ -231,6 +245,38 @@ function ProjectDetails() {
       );
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  const handleAIRecommendations = async () => {
+    try {
+      setAiLoading(true);
+      setAiError("");
+      setShowRecommendations(true);
+
+      const res = await api.post(
+        `/${id}/ai-recommendations`
+      );
+
+      setRecommendations(
+        Array.isArray(res.data.recommendations)
+          ? res.data.recommendations
+          : []
+      );
+    } catch (error) {
+      console.log(
+        "AI Recommendation Error:",
+        error
+      );
+
+      setRecommendations([]);
+
+      setAiError(
+        error.response?.data?.message ||
+          "Unable to generate AI team recommendations. Please try again."
+      );
+    } finally {
+      setAiLoading(false);
     }
   };
 
@@ -384,6 +430,18 @@ function ProjectDetails() {
                   </a>
                 )}
 
+                <button
+                  onClick={handleAIRecommendations}
+                  disabled={aiLoading}
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white rounded-xl font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  <FaRobot />
+
+                  {aiLoading
+                    ? "AI Analyzing..."
+                    : "Find Team with AI"}
+                </button>
+
                 {isProjectOwner && (
                   <>
                     <button
@@ -400,6 +458,7 @@ function ProjectDetails() {
                       className="flex items-center justify-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition disabled:opacity-50"
                     >
                       <FaTrash />
+
                       {actionLoading
                         ? "Deleting..."
                         : "Delete Project"}
@@ -407,6 +466,301 @@ function ProjectDetails() {
                   </>
                 )}
               </div>
+
+              {showRecommendations && (
+                <section className="mb-10">
+                  <div className="rounded-3xl border border-violet-200 dark:border-violet-900/50 bg-gradient-to-br from-violet-50 via-white to-indigo-50 dark:from-violet-950/30 dark:via-slate-800 dark:to-indigo-950/30 overflow-hidden">
+                    <div className="p-6 md:p-8 border-b border-violet-100 dark:border-violet-900/50">
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-2xl bg-violet-600 text-white flex items-center justify-center shadow-lg">
+                              <FaRobot className="text-xl" />
+                            </div>
+
+                            <div>
+                              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                                AI Team Recommendations
+                              </h2>
+
+                              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                Gemini analyzed the project requirements and available users.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={handleAIRecommendations}
+                          disabled={aiLoading}
+                          className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-violet-200 dark:border-violet-800 text-violet-600 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-slate-700 transition disabled:opacity-50"
+                        >
+                          <FaSyncAlt
+                            className={
+                              aiLoading
+                                ? "animate-spin"
+                                : ""
+                            }
+                          />
+
+                          {aiLoading
+                            ? "Analyzing..."
+                            : "Run Again"}
+                        </button>
+                      </div>
+                    </div>
+
+                    {aiLoading ? (
+                      <div className="p-10 text-center">
+                        <div className="w-14 h-14 border-4 border-violet-200 border-t-violet-600 rounded-full animate-spin mx-auto" />
+
+                        <h3 className="mt-5 text-lg font-semibold text-gray-900 dark:text-white">
+                          Finding the best teammates...
+                        </h3>
+
+                        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                          Gemini is matching project requirements with user skills.
+                        </p>
+                      </div>
+                    ) : aiError ? (
+                      <div className="p-8 text-center">
+                        <div className="w-14 h-14 mx-auto rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center">
+                          <FaTimesCircle className="text-2xl" />
+                        </div>
+
+                        <h3 className="mt-4 text-lg font-semibold text-gray-900 dark:text-white">
+                          AI Recommendation Failed
+                        </h3>
+
+                        <p className="mt-2 text-sm text-red-500 dark:text-red-400">
+                          {aiError}
+                        </p>
+
+                        <button
+                          onClick={handleAIRecommendations}
+                          className="mt-5 px-5 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold transition"
+                        >
+                          Try Again
+                        </button>
+                      </div>
+                    ) : recommendations.length === 0 ? (
+                      <div className="p-10 text-center">
+                        <FaUsers className="mx-auto text-4xl text-gray-300 dark:text-gray-600" />
+
+                        <h3 className="mt-4 text-lg font-semibold text-gray-900 dark:text-white">
+                          No Recommendations Found
+                        </h3>
+
+                        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                          There are currently no suitable users available for this project.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="p-6 md:p-8">
+                        <div className="flex items-center justify-between mb-5">
+                          <div>
+                            <h3 className="font-bold text-gray-900 dark:text-white">
+                              Best Matching Members
+                            </h3>
+
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                              {recommendations.length} potential teammate
+                              {recommendations.length !== 1
+                                ? "s"
+                                : ""}{" "}
+                              found
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                          {recommendations.map(
+                            (recommendation, index) => (
+                              <div
+                                key={
+                                  recommendation.userId ||
+                                  index
+                                }
+                                className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 p-5 hover:shadow-lg hover:border-violet-300 dark:hover:border-violet-700 transition"
+                              >
+                                <div className="flex items-start gap-4">
+                                  {recommendation.profileImage ? (
+                                    <img
+                                      src={
+                                        recommendation.profileImage
+                                      }
+                                      alt={
+                                        recommendation.name
+                                      }
+                                      className="w-16 h-16 rounded-2xl object-cover border-2 border-violet-100 dark:border-violet-900"
+                                    />
+                                  ) : (
+                                    <FaUserCircle className="text-6xl text-violet-500" />
+                                  )}
+
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-start justify-between gap-3">
+                                      <div>
+                                        <h4 className="font-bold text-gray-900 dark:text-white text-lg">
+                                          {recommendation.name ||
+                                            "User"}
+                                        </h4>
+
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                          {recommendation.branch ||
+                                            "Student"}
+
+                                          {recommendation.year
+                                            ? ` • ${recommendation.year}`
+                                            : ""}
+                                        </p>
+                                      </div>
+
+                                      <div className="flex-shrink-0 text-center">
+                                        <div className="w-14 h-14 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
+                                          <span className="text-sm font-bold text-violet-700 dark:text-violet-300">
+                                            {recommendation.matchPercentage ||
+                                              0}
+                                            %
+                                          </span>
+                                        </div>
+
+                                        <span className="text-[10px] text-gray-400 dark:text-gray-500">
+                                          MATCH
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="mt-5">
+                                  <div className="flex items-center justify-between text-xs mb-2">
+                                    <span className="text-gray-500 dark:text-gray-400">
+                                      Compatibility
+                                    </span>
+
+                                    <span className="font-semibold text-violet-600 dark:text-violet-400">
+                                      {recommendation.matchPercentage ||
+                                        0}
+                                      %
+                                    </span>
+                                  </div>
+
+                                  <div className="h-2.5 w-full rounded-full bg-gray-200 dark:bg-slate-700 overflow-hidden">
+                                    <div
+                                      className="h-full rounded-full bg-gradient-to-r from-violet-600 to-indigo-500 transition-all"
+                                      style={{
+                                        width: `${Math.min(
+                                          100,
+                                          Math.max(
+                                            0,
+                                            Number(
+                                              recommendation.matchPercentage
+                                            ) || 0
+                                          )
+                                        )}%`,
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+
+                                <div className="mt-5">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <FaCheckCircle className="text-green-500" />
+
+                                    <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                      Matched Skills
+                                    </span>
+                                  </div>
+
+                                  {recommendation.matchedSkills
+                                    ?.length > 0 ? (
+                                    <div className="flex flex-wrap gap-2">
+                                      {recommendation.matchedSkills.map(
+                                        (skill, skillIndex) => (
+                                          <span
+                                            key={
+                                              skillIndex
+                                            }
+                                            className="px-2.5 py-1 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-medium"
+                                          >
+                                            {skill}
+                                          </span>
+                                        )
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <p className="text-xs text-gray-400 dark:text-gray-500">
+                                      No direct skill matches found.
+                                    </p>
+                                  )}
+                                </div>
+
+                                {recommendation.missingSkills
+                                  ?.length > 0 && (
+                                  <div className="mt-4">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <FaTimesCircle className="text-orange-500" />
+
+                                      <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                        Missing Skills
+                                      </span>
+                                    </div>
+
+                                    <div className="flex flex-wrap gap-2">
+                                      {recommendation.missingSkills.map(
+                                        (skill, skillIndex) => (
+                                          <span
+                                            key={
+                                              skillIndex
+                                            }
+                                            className="px-2.5 py-1 rounded-lg bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs font-medium"
+                                          >
+                                            {skill}
+                                          </span>
+                                        )
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+
+                                <div className="mt-5 p-4 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-100 dark:border-slate-700">
+                                  <div className="flex items-center gap-2">
+                                    <FaStar className="text-amber-500" />
+
+                                    <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                                      AI Recommendation
+                                    </span>
+                                  </div>
+
+                                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 leading-6">
+                                    {recommendation.reason ||
+                                      "Good match for this project."}
+                                  </p>
+                                </div>
+
+                                <div className="mt-5 flex gap-3">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      navigate(
+                                        `/profile/${recommendation.userId}`
+                                      )
+                                    }
+                                    className="flex-1 px-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 transition font-semibold text-sm"
+                                  >
+                                    View Profile
+                                  </button>
+                                </div>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </section>
+              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
                 <div className="p-5 rounded-2xl bg-violet-50 dark:bg-violet-900/20">
@@ -421,7 +775,8 @@ function ProjectDetails() {
                       </p>
 
                       <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {project.teamMembers?.length || 0}
+                        {project.teamMembers?.length ||
+                          0}
                       </p>
                     </div>
                   </div>
@@ -439,7 +794,8 @@ function ProjectDetails() {
                       </p>
 
                       <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {project.requiredSkills?.length || 0}
+                        {project.requiredSkills?.length ||
+                          0}
                       </p>
                     </div>
                   </div>
@@ -482,7 +838,8 @@ function ProjectDetails() {
                       Required Skills
                     </h2>
 
-                    {project.requiredSkills?.length > 0 ? (
+                    {project.requiredSkills?.length >
+                    0 ? (
                       <div className="flex flex-wrap gap-3 mt-4">
                         {project.requiredSkills.map(
                           (skill, index) => (
@@ -509,7 +866,9 @@ function ProjectDetails() {
                       </h2>
 
                       <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {project.teamMembers?.length || 0} members
+                        {project.teamMembers?.length ||
+                          0}{" "}
+                        members
                       </span>
                     </div>
 
@@ -523,7 +882,8 @@ function ProjectDetails() {
                                 : null;
 
                             const memberId =
-                              memberData?._id || member;
+                              memberData?._id ||
+                              member;
 
                             const memberIsOwner =
                               project.createdBy?._id
@@ -593,7 +953,9 @@ function ProjectDetails() {
                                           memberId
                                         )
                                       }
-                                      disabled={actionLoading}
+                                      disabled={
+                                        actionLoading
+                                      }
                                       className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 transition disabled:opacity-50"
                                     >
                                       <FaTrash />
@@ -757,6 +1119,38 @@ function ProjectDetails() {
                       className="mt-5 w-full py-3 rounded-xl bg-white text-violet-700 font-semibold hover:bg-gray-100 transition"
                     >
                       Open Task Board
+                    </button>
+                  </div>
+
+                  <div className="p-6 rounded-2xl border border-violet-200 dark:border-violet-900/50 bg-violet-50 dark:bg-violet-950/20">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-violet-600 text-white flex items-center justify-center">
+                        <FaRobot />
+                      </div>
+
+                      <div>
+                        <h3 className="font-bold text-gray-900 dark:text-white">
+                          AI Team Builder
+                        </h3>
+
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Powered by Gemini
+                        </p>
+                      </div>
+                    </div>
+
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-4 leading-6">
+                      Find users whose skills best match your project's requirements.
+                    </p>
+
+                    <button
+                      onClick={handleAIRecommendations}
+                      disabled={aiLoading}
+                      className="mt-4 w-full py-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold transition disabled:opacity-50"
+                    >
+                      {aiLoading
+                        ? "Analyzing..."
+                        : "Find Best Teammates"}
                     </button>
                   </div>
                 </div>
