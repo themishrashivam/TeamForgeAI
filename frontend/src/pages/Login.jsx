@@ -19,6 +19,7 @@ function Login() {
     email: "",
     password: "",
   });
+
   const [showSuccess, setShowSuccess] = useState(false);
 
   const [loading, setLoading] = useState(false);
@@ -43,13 +44,11 @@ function Login() {
 
       setShowSuccess(true);
 
-      setTimeout(()=>{
+      setTimeout(() => {
         navigate("/dashboard");
-      },2000);
-      
-
+      }, 2000);
     } catch (error) {
-      toast.error("Login Failed!")
+      toast.error("Login Failed!");
     } finally {
       setLoading(false);
     }
@@ -74,28 +73,29 @@ function Login() {
       LEFT SECTION */}
 
       {
-  showSuccess && (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        showSuccess && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
 
-      <div className="bg-white p-8 rounded-2xl shadow-xl text-center w-80">
+            <div className="bg-white p-8 rounded-2xl shadow-xl text-center w-80">
 
-        <FaCheckCircle
-          className="text-green-600 text-7xl mx-auto animate-bounce"
-        />
+              <FaCheckCircle
+                className="text-green-600 text-7xl mx-auto animate-bounce"
+              />
 
-        <h2 className="text-2xl font-bold mt-4 text-green-600">
-          Login Successful
-        </h2>
+              <h2 className="text-2xl font-bold mt-4 text-green-600">
+                Login Successful
+              </h2>
 
-        <p className="text-gray-500 mt-2">
-          Redirecting to Dashboard...
-        </p>
+              <p className="text-gray-500 mt-2">
+                Redirecting to Dashboard...
+              </p>
 
-      </div>
+            </div>
 
-    </div>
-  )
-}
+          </div>
+        )
+      }
+
       <div className="w-full lg:w-1/2 px-6 md:px-12 lg:px-20 py-10 flex flex-col">
 
         <div>
@@ -251,6 +251,9 @@ function Login() {
             <div className="text-right">
               <button
                 type="button"
+                onClick={() =>
+                  navigate("/forgot-password")
+                }
                 className="text-violet-600 hover:underline"
               >
                 Forgot Password?
