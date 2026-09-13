@@ -76,12 +76,22 @@ function ForgotPassword() {
       return;
     }
 
-    navigate(
-      resetUrl.replace(
-        window.location.origin,
-        ""
-      )
-    );
+    try {
+      const url = new URL(resetUrl);
+
+      navigate(
+        `${url.pathname}${url.search}${url.hash}`
+      );
+    } catch (error) {
+      console.log(
+        "Invalid Reset URL:",
+        error
+      );
+
+      setError(
+        "Invalid password reset link."
+      );
+    }
   };
 
   return (
