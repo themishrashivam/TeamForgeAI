@@ -4,7 +4,6 @@ import Topbar from "../components/Topbar";
 import api from "../services/api";
 
 function ExploreProjects() {
-
   const [projects, setProjects] = useState([]);
   const [user, setUser] = useState(null);
 
@@ -22,180 +21,342 @@ function ExploreProjects() {
     }
   };
 
-  const sendJoinRequest = async (
-    projectId
-    ) => {
+  const sendJoinRequest = async (projectId) => {
     try {
+      await api.post("/send", {
+        projectId,
+      });
 
-        await api.post(
-        "/send",
-        {
-            projectId,
-        }
-        );
-
-        alert(
-        "Request sent successfully"
-        );
-
+      alert("Request sent successfully");
     } catch (error) {
-
-        alert(
-        error.response?.data?.message
-        );
-
+      alert(error.response?.data?.message);
     }
-    };
+  };
+
   const fetchProjects = async () => {
     try {
-
       const res = await api.get("/all");
 
       setProjects(res.data.projects);
-
     } catch (error) {
       console.log(error);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] flex">
-
+    <div
+      className="
+        min-h-screen
+        flex
+        bg-[#f8f9fc]
+        dark:bg-slate-900
+        text-gray-900
+        dark:text-white
+        transition-colors
+        duration-200
+      "
+    >
+      {/* Sidebar */}
       <Sidebar />
 
-      <div className="flex-1 ml-64">
-
+      {/* Main Content */}
+      <div
+        className="
+          flex-1
+          min-w-0
+          ml-0
+          md:ml-64
+        "
+      >
+        {/* Topbar */}
         <Topbar user={user} />
 
-        <div className="p-6">
+        {/* Page Content */}
+        <main
+          className="
+            p-4
+            sm:p-5
+            md:p-6
+            lg:p-8
+          "
+        >
+          <div className="max-w-7xl mx-auto">
+            {/* Page Heading */}
+            <h1
+              className="
+                text-2xl
+                sm:text-3xl
+                font-bold
+                text-gray-900
+                dark:text-white
+              "
+            >
+              Explore Projects
+            </h1>
 
-          <h1 className="text-3xl font-bold">
-            Explore Projects
-          </h1>
+            <p
+              className="
+                text-gray-500
+                dark:text-gray-400
+                mt-2
+                mb-6
+                sm:mb-8
+                text-sm
+                sm:text-base
+              "
+            >
+              Discover projects and join teams
+            </p>
 
-          <p className="text-gray-500 mt-2 mb-8">
-            Discover projects and join teams
-          </p>
+            {/* Projects Grid */}
+            <div
+              className="
+                grid
+                grid-cols-1
+                md:grid-cols-2
+                gap-5
+                sm:gap-6
+              "
+            >
+              {projects.map((project) => (
+                <div
+                  key={project._id}
+                  className="
+                    bg-white
+                    dark:bg-slate-800
+                    rounded-2xl
+                    overflow-hidden
+                    shadow-sm
+                    dark:shadow-black/20
+                    border
+                    border-gray-100
+                    dark:border-slate-700
+                    hover:shadow-lg
+                    dark:hover:shadow-black/30
+                    transition
+                    duration-200
+                    min-w-0
+                  "
+                >
+                  {/* Project Image */}
+                  <img
+                    src={
+                      project.image ||
+                      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200"
+                    }
+                    alt={project.title}
+                    className="
+                      w-full
+                      h-44
+                      sm:h-48
+                      md:h-52
+                      object-cover
+                    "
+                  />
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Project Content */}
+                  <div className="p-4 sm:p-5">
+                    {/* Title + Status */}
+                    <div
+                      className="
+                        flex
+                        flex-col
+                        sm:flex-row
+                        justify-between
+                        items-start
+                        gap-3
+                      "
+                    >
+                      <h2
+                        className="
+                          text-lg
+                          sm:text-xl
+                          font-bold
+                          text-gray-900
+                          dark:text-white
+                          break-words
+                          min-w-0
+                        "
+                      >
+                        {project.title}
+                      </h2>
 
-            {projects.map((project) => (
-
-              <div
-                key={project._id}
-                className="
-                  bg-white
-                  rounded-2xl
-                  overflow-hidden
-                  shadow-sm
-                  hover:shadow-lg
-                  transition
-                "
-              >
-
-                <img
-                  src={
-                    project.image ||
-                    "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200"
-                  }
-                  alt={project.title}
-                  className="w-full h-52 object-cover"
-                />
-
-                <div className="p-5">
-
-                  <div className="flex justify-between items-center">
-
-                    <h2 className="text-xl font-bold">
-                      {project.title}
-                    </h2>
-
-                    <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
-                      {project.status || "Active"}
-                    </span>
-
-                  </div>
-
-                  <p className="text-gray-600 mt-3">
-                    {project.description}
-                  </p>
-
-                  <div className="flex flex-wrap gap-2 mt-4">
-
-                    {project.requiredSkills?.map(
-                      (skill, index) => (
-                        <span
-                          key={index}
-                          className="
-                            px-3
-                            py-1
-                            bg-violet-100
-                            text-violet-700
-                            rounded-full
-                            text-sm
-                          "
-                        >
-                          {skill}
-                        </span>
-                      )
-                    )}
-
-                  </div>
-
-                  {/* Creator */}
-
-                  <div className="flex items-center gap-3 mt-5">
-
-                    <img
-                      src={
-                        project.createdBy
-                          ?.profileImage ||
-                        "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-                      }
-                      alt=""
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-
-                    <div>
-                      <h4 className="font-semibold">
-                        {project.createdBy?.name}
-                      </h4>
-
-                      <p className="text-sm text-gray-500">
-                        Project Creator
-                      </p>
+                      <span
+                        className="
+                          shrink-0
+                          px-3
+                          py-1
+                          bg-green-100
+                          dark:bg-green-900/30
+                          text-green-700
+                          dark:text-green-400
+                          rounded-full
+                          text-xs
+                          sm:text-sm
+                        "
+                      >
+                        {project.status || "Active"}
+                      </span>
                     </div>
 
-                  </div>
+                    {/* Description */}
+                    <p
+                      className="
+                        text-gray-600
+                        dark:text-gray-300
+                        mt-3
+                        text-sm
+                        sm:text-base
+                        leading-6
+                        break-words
+                      "
+                    >
+                      {project.description}
+                    </p>
 
-                 <button
-                    onClick={() =>
+                    {/* Required Skills */}
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      {project.requiredSkills?.map(
+                        (skill, index) => (
+                          <span
+                            key={index}
+                            className="
+                              px-3
+                              py-1
+                              bg-violet-100
+                              dark:bg-violet-900/30
+                              text-violet-700
+                              dark:text-violet-300
+                              rounded-full
+                              text-xs
+                              sm:text-sm
+                              break-words
+                            "
+                          >
+                            {skill}
+                          </span>
+                        )
+                      )}
+                    </div>
+
+                    {/* Creator */}
+                    <div
+                      className="
+                        flex
+                        items-center
+                        gap-3
+                        mt-5
+                        min-w-0
+                      "
+                    >
+                      <img
+                        src={
+                          project.createdBy?.profileImage ||
+                          "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                        }
+                        alt=""
+                        className="
+                          w-9
+                          h-9
+                          sm:w-10
+                          sm:h-10
+                          rounded-full
+                          object-cover
+                          shrink-0
+                        "
+                      />
+
+                      <div className="min-w-0">
+                        <h4
+                          className="
+                            font-semibold
+                            text-gray-900
+                            dark:text-white
+                            text-sm
+                            sm:text-base
+                            truncate
+                          "
+                        >
+                          {project.createdBy?.name}
+                        </h4>
+
+                        <p
+                          className="
+                            text-xs
+                            sm:text-sm
+                            text-gray-500
+                            dark:text-gray-400
+                          "
+                        >
+                          Project Creator
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Join Request Button */}
+                    <button
+                      onClick={() =>
                         sendJoinRequest(project._id)
-                    }
-                    className="
+                      }
+                      className="
                         w-full
                         mt-5
                         py-3
+                        px-4
                         bg-violet-600
+                        hover:bg-violet-700
+                        active:bg-violet-800
+                        dark:bg-violet-600
+                        dark:hover:bg-violet-500
                         text-white
                         rounded-xl
-                    "
+                        text-sm
+                        sm:text-base
+                        font-medium
+                        transition
+                        duration-200
+                        touch-manipulation
+                      "
                     >
-                    Request To Join
+                      Request To Join
                     </button>
-
+                  </div>
                 </div>
+              ))}
+            </div>
 
+            {/* Empty State */}
+            {projects.length === 0 && (
+              <div
+                className="
+                  bg-white
+                  dark:bg-slate-800
+                  rounded-2xl
+                  p-8
+                  sm:p-10
+                  text-center
+                  shadow-sm
+                  dark:shadow-black/20
+                  border
+                  border-gray-100
+                  dark:border-slate-700
+                "
+              >
+                <p
+                  className="
+                    text-gray-500
+                    dark:text-gray-400
+                    text-sm
+                    sm:text-base
+                  "
+                >
+                  No projects available at the moment.
+                </p>
               </div>
-
-            ))}
-
+            )}
           </div>
-
-        </div>
-
+        </main>
       </div>
-
     </div>
   );
 }

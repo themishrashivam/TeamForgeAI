@@ -22,10 +22,6 @@ function MyProjects() {
     requiredSkills: "",
   });
 
-  // ==========================================
-  // Fetch Profile + Projects
-  // ==========================================
-
   useEffect(() => {
     fetchProfile();
     fetchProjects();
@@ -34,7 +30,6 @@ function MyProjects() {
   const fetchProfile = async () => {
     try {
       const res = await api.get("/profile");
-
       setUser(res.data.user);
     } catch (error) {
       console.log("Profile Error:", error);
@@ -44,7 +39,6 @@ function MyProjects() {
   const fetchProjects = async () => {
     try {
       const res = await api.get("/my");
-
       setProjects(res.data.projects || []);
     } catch (error) {
       console.log("Projects Error:", error);
@@ -53,20 +47,12 @@ function MyProjects() {
     }
   };
 
-  // ==========================================
-  // Form Change
-  // ==========================================
-
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
-
-  // ==========================================
-  // Create Project
-  // ==========================================
 
   const handleCreateProject = async (e) => {
     e.preventDefault();
@@ -94,14 +80,9 @@ function MyProjects() {
       fetchProjects();
     } catch (error) {
       console.log("Create Project Error:", error);
-
       alert("Failed to create project");
     }
   };
-
-  // ==========================================
-  // Loading
-  // ==========================================
 
   if (loading) {
     return (
@@ -122,10 +103,6 @@ function MyProjects() {
     );
   }
 
-  // ==========================================
-  // UI
-  // ==========================================
-
   return (
     <div
       className="
@@ -140,15 +117,9 @@ function MyProjects() {
       <Sidebar />
 
       <div className="flex-1 md:ml-64">
-
         <Topbar user={user} />
 
         <div className="p-3 sm:p-4 md:p-6">
-
-          {/* =====================================
-              Header
-          ====================================== */}
-
           <div
             className="
               flex
@@ -161,7 +132,6 @@ function MyProjects() {
             "
           >
             <div>
-
               <h1
                 className="
                   text-2xl
@@ -183,7 +153,6 @@ function MyProjects() {
               >
                 Manage and track your projects
               </p>
-
             </div>
 
             <button
@@ -203,15 +172,9 @@ function MyProjects() {
             >
               + Create Project
             </button>
-
           </div>
 
-          {/* =====================================
-              Projects
-          ====================================== */}
-
           {projects.length > 0 ? (
-
             <div
               className="
                 grid
@@ -220,9 +183,7 @@ function MyProjects() {
                 gap-6
               "
             >
-
               {projects.map((project) => (
-
                 <div
                   key={project._id}
                   onClick={() =>
@@ -241,11 +202,6 @@ function MyProjects() {
                     transition
                   "
                 >
-
-                  {/* =================================
-                      Project Image
-                  ================================== */}
-
                   <img
                     src={
                       project.image ||
@@ -259,14 +215,7 @@ function MyProjects() {
                     "
                   />
 
-                  {/* =================================
-                      Project Content
-                  ================================== */}
-
                   <div className="p-5">
-
-                    {/* Title + Status */}
-
                     <div
                       className="
                         flex
@@ -277,7 +226,6 @@ function MyProjects() {
                         gap-3
                       "
                     >
-
                       <h2
                         className="
                           text-xl
@@ -304,10 +252,7 @@ function MyProjects() {
                       >
                         {project.status || "Active"}
                       </span>
-
                     </div>
-
-                    {/* Description */}
 
                     <p
                       className="
@@ -320,8 +265,6 @@ function MyProjects() {
                       {project.description}
                     </p>
 
-                    {/* Skills */}
-
                     <div
                       className="
                         flex
@@ -332,7 +275,6 @@ function MyProjects() {
                     >
                       {project.requiredSkills?.map(
                         (skill, index) => (
-
                           <span
                             key={index}
                             className="
@@ -348,14 +290,9 @@ function MyProjects() {
                           >
                             {skill}
                           </span>
-
                         )
                       )}
                     </div>
-
-                    {/* =================================
-                        Bottom Section
-                    ================================== */}
 
                     <div
                       className="
@@ -368,7 +305,6 @@ function MyProjects() {
                         gap-3
                       "
                     >
-
                       <span
                         className="
                           text-sm
@@ -380,8 +316,6 @@ function MyProjects() {
                         {project.teamMembers?.length || 0}
                       </span>
 
-                      {/* Buttons */}
-
                       <div
                         className="
                           flex
@@ -392,9 +326,6 @@ function MyProjects() {
                           sm:w-auto
                         "
                       >
-
-                        {/* View Details */}
-
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -421,14 +352,12 @@ function MyProjects() {
                           View Details
                         </button>
 
-                        {/* Task Board */}
-
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
 
                             navigate(
-                              `/tasks/${project._id}`
+                              `/project/${project._id}/tasks`
                             );
                           }}
                           className="
@@ -446,25 +375,13 @@ function MyProjects() {
                         >
                           Task Board
                         </button>
-
                       </div>
-
                     </div>
-
                   </div>
-
                 </div>
-
               ))}
-
             </div>
-
           ) : (
-
-            /* =====================================
-                Empty State
-            ====================================== */
-
             <div
               className="
                 bg-white
@@ -478,7 +395,6 @@ function MyProjects() {
                 text-center
               "
             >
-
               <h2
                 className="
                   text-xl
@@ -502,9 +418,7 @@ function MyProjects() {
               </p>
 
               <button
-                onClick={() =>
-                  setShowCreateModal(true)
-                }
+                onClick={() => setShowCreateModal(true)}
                 className="
                   mt-6
                   px-6
@@ -518,28 +432,17 @@ function MyProjects() {
               >
                 + Create Project
               </button>
-
             </div>
-
           )}
-
         </div>
-
       </div>
-
-      {/* =========================================
-          Create Project Modal
-      ========================================== */}
 
       {showCreateModal && (
         <CreateProjectModal
-          onClose={() =>
-            setShowCreateModal(false)
-          }
+          onClose={() => setShowCreateModal(false)}
           onProjectCreated={fetchProjects}
         />
       )}
-
     </div>
   );
 }

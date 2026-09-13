@@ -3,7 +3,6 @@ import {
   FaUserEdit,
   FaTimes,
   FaPlus,
-  FaTrash,
 } from "react-icons/fa";
 
 function BioCard({
@@ -17,18 +16,32 @@ function BioCard({
   const [editedSkills, setEditedSkills] = useState([]);
   const [newSkill, setNewSkill] = useState("");
 
+  /*
+    Create a stable value based on skill contents instead of
+    depending directly on the skills array reference.
+
+    This prevents the useEffect from running infinitely when
+    the parent passes a newly-created array on every render.
+  */
+  const skillsKey = Array.isArray(skills)
+    ? skills.join("\u0000")
+    : "";
+
   useEffect(() => {
     setEditedBio(bio || "");
+
     setEditedSkills(
       Array.isArray(skills) ? [...skills] : []
     );
-  }, [bio, skills]);
+  }, [bio, skillsKey]);
 
   const openEdit = () => {
     setEditedBio(bio || "");
+
     setEditedSkills(
       Array.isArray(skills) ? [...skills] : []
     );
+
     setNewSkill("");
     setShowEdit(true);
   };
