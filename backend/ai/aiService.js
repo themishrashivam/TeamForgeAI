@@ -1,11 +1,18 @@
-const OPENROUTER_URL =
-  "https://openrouter.ai/api/v1/chat/completions";
+import { GoogleGenAI } from "@google/genai";
 
-// OpenRouter free model
-const MODEL = "nex-agi/nex-n2.5-mini:free";
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
+
+const MODEL = "gemini-3.8-flash";
+
+/* =========================================================
+   PROJECT ANALYSIS SCHEMA
+========================================================= */
 
 const projectAnalysisSchema = {
   type: "object",
+
   properties: {
     summary: {
       type: "string",
@@ -77,6 +84,10 @@ const projectAnalysisSchema = {
   additionalProperties: false,
 };
 
+/* =========================================================
+   TEAM RECOMMENDATION SCHEMA
+========================================================= */
+
 const teamRecommendationSchema = {
   type: "object",
 
@@ -98,6 +109,7 @@ const teamRecommendationSchema = {
 
           matchedSkills: {
             type: "array",
+
             items: {
               type: "string",
             },
@@ -105,6 +117,7 @@ const teamRecommendationSchema = {
 
           missingSkills: {
             type: "array",
+
             items: {
               type: "string",
             },
@@ -128,13 +141,25 @@ const teamRecommendationSchema = {
     },
   },
 
-  required: ["recommendations"],
+  required: [
+    "recommendations",
+  ],
 
   additionalProperties: false,
 };
 
+/* =========================================================
+   UTILITY
+========================================================= */
+
 const sleep = (ms) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+  new Promise((resolve) =>
+    setTimeout(resolve, ms)
+  );
+
+/* =========================================================
+   TEMPORARY ERROR CHECK
+========================================================= */
 
 const isTemporaryError = (error) => {
   const message =
@@ -142,7 +167,9 @@ const isTemporaryError = (error) => {
     JSON.stringify(error) ||
     "";
 
-  const status = error?.status;
+  const status =
+    error?.status ||
+    error?.code;
 
   return (
     status === 429 ||
@@ -155,166 +182,170 @@ const isTemporaryError = (error) => {
     message.includes("502") ||
     message.includes("503") ||
     message.includes("504") ||
-    message.toLowerCase().includes("rate limit") ||
-    message.toLowerCase().includes("too many requests") ||
-    message.toLowerCase().includes("overloaded") ||
-    message.toLowerCase().includes("temporarily unavailable")
+    message
+      .toLowerCase()
+      .includes("rate limit") ||
+    message
+      .toLowerCase()
+      .includes("too many requests") ||
+    message
+      .toLowerCase()
+      .includes("overloaded") ||
+    message
+      .toLowerCase()
+      .includes(
+        "temporarily unavailable"
+      )
   );
 };
+
+/* =========================================================
+   GEMINI GENERATION
+========================================================= */
 
 const generateWithModel = async (
   model,
   prompt,
   responseSchema
 ) => {
-  if (!process.env.OPENROUTER_API_KEY) {
+  if (!process.env.GEMINI_API_KEY) {
     throw new Error(
-      "OPENROUTER_API_KEY is not configured."
+      "GEMINI_API_KEY is not configured."
     );
-  }
-
-  const response = await fetch(
-    OPENROUTER_URL,
-    {
-      method: "POST",
-
-      headers: {
-        Authorization:
-          `Bearer ${process.env.OPENROUTER_API_KEY}`,
-
-        "Content-Type": "application/json",
-
-        "HTTP-Referer":
-          process.env.APP_URL ||
-          "http://localhost:5000",
-
-        "X-Title":
-          "TeamForgeAI",
-      },
-
-      body: JSON.stringify({
-        model,
-
-        messages: [
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-
-        response_format: {
-          type: "json_schema",
-
-          json_schema: {
-            name: "ai_response",
-
-            strict: true,
-
-            schema: responseSchema,
-          },
-        },
-
-        temperature: 0.2,
-
-        max_tokens: 3000,
-      }),
-    }
-  );
-
-  const data = await response.json();
-
-  // IMPORTANT:
-  // Print the complete response from OpenRouter.
-  console.log(
-    "========== OPENROUTER RESPONSE =========="
-  );
-
-  console.log(
-    JSON.stringify(data, null, 2)
-  );
-
-  console.log(
-    "=========================================="
-  );
-
-  if (!response.ok) {
-    const errorMessage =
-      data?.error?.message ||
-      data?.message ||
-      `OpenRouter request failed with status ${response.status}`;
-
-    const error = new Error(errorMessage);
-
-    error.status = response.status;
-    error.data = data;
-
-    throw error;
-  }
-
-  const message =
-    data?.choices?.[0]?.message;
-
-  console.log(
-    "OpenRouter message:",
-    JSON.stringify(message, null, 2)
-  );
-
-  let result =
-    message?.content?.trim();
-
-  /*
-   * Some models/providers may return the
-   * structured response differently.
-   */
-  if (!result && message?.refusal) {
-    throw new Error(
-      `OpenRouter model refused the request: ${message.refusal}`
-    );
-  }
-
-  if (!result) {
-    throw new Error(
-      "OpenRouter returned an empty content response."
-    );
-  }
-
-  /*
-   * Remove accidental markdown JSON fences.
-   *
-   * Example:
-   * ```json
-   * { ... }
-   * ```
-   */
-  if (result.startsWith("```")) {
-    result = result
-      .replace(/^```json\s*/i, "")
-      .replace(/^```\s*/i, "")
-      .replace(/\s*```$/i, "")
-      .trim();
   }
 
   try {
-    const parsed = JSON.parse(result);
+    console.log(
+      "======================================"
+    );
 
     console.log(
-      "Parsed AI result:",
-      JSON.stringify(parsed, null, 2)
+      `GEMINI REQUEST`
     );
 
-    return parsed;
+    console.log(
+      `Model: ${model}`
+    );
+
+    console.log(
+      "======================================"
+    );
+
+    const response =
+      await ai.models.generateContent({
+        model,
+
+        contents: prompt,
+
+        config: {
+          maxOutputTokens: 3000,
+
+          responseMimeType:
+            "application/json",
+
+          responseSchema,
+        },
+      });
+
+    console.log(
+      "======================================"
+    );
+
+    console.log(
+      "GEMINI RESPONSE RECEIVED"
+    );
+
+    console.log(
+      "======================================"
+    );
+
+    /*
+     * Gemini SDK returns generated
+     * text through response.text
+     */
+
+    let result =
+      response?.text?.trim();
+
+    if (!result) {
+      throw new Error(
+        "Gemini returned an empty response."
+      );
+    }
+
+    /*
+     * Remove accidental markdown
+     * JSON code fences if present.
+     */
+
+    if (
+      result.startsWith("```")
+    ) {
+      result = result
+        .replace(
+          /^```json\s*/i,
+          ""
+        )
+        .replace(
+          /^```\s*/i,
+          ""
+        )
+        .replace(
+          /\s*```$/i,
+          ""
+        )
+        .trim();
+    }
+
+    try {
+      const parsed =
+        JSON.parse(result);
+
+      console.log(
+        "======================================"
+      );
+
+      console.log(
+        "PARSED GEMINI RESULT"
+      );
+
+      console.log(
+        JSON.stringify(
+          parsed,
+          null,
+          2
+        )
+      );
+
+      console.log(
+        "======================================"
+      );
+
+      return parsed;
+    } catch (parseError) {
+      console.error(
+        "Gemini JSON Parse Error:"
+      );
+
+      console.error(result);
+
+      throw new Error(
+        "Gemini returned invalid JSON."
+      );
+    }
   } catch (error) {
     console.error(
-      "OpenRouter JSON Parse Error:"
+      "Gemini API Error:",
+      error?.message || error
     );
 
-    console.error(result);
-
-    throw new Error(
-      "OpenRouter returned invalid JSON."
-    );
+    throw error;
   }
 };
+
+/* =========================================================
+   RETRY HANDLER
+========================================================= */
 
 const runWithFallback = async (
   prompt,
@@ -323,12 +354,17 @@ const runWithFallback = async (
   let lastError = null;
 
   /*
-   * Keep the same retry behavior.
+   * Try Gemini maximum 2 times.
    */
-  for (let attempt = 1; attempt <= 2; attempt++) {
+
+  for (
+    let attempt = 1;
+    attempt <= 2;
+    attempt++
+  ) {
     try {
       console.log(
-        `OpenRouter request: ${MODEL}, attempt ${attempt}`
+        `Gemini request: ${MODEL}, attempt ${attempt}`
       );
 
       const result =
@@ -339,7 +375,7 @@ const runWithFallback = async (
         );
 
       console.log(
-        `OpenRouter request successful using ${MODEL}`
+        `Gemini request successful using ${MODEL}`
       );
 
       return result;
@@ -347,13 +383,23 @@ const runWithFallback = async (
       lastError = error;
 
       console.error(
-        `OpenRouter attempt ${attempt} failed:`,
+        `Gemini attempt ${attempt} failed:`,
         error?.message || error
       );
 
-      if (!isTemporaryError(error)) {
+      /*
+       * Do not retry permanent errors.
+       */
+
+      if (
+        !isTemporaryError(error)
+      ) {
         break;
       }
+
+      /*
+       * Wait before retry.
+       */
 
       if (attempt < 2) {
         await sleep(1500);
@@ -362,45 +408,58 @@ const runWithFallback = async (
   }
 
   console.error(
-    "All OpenRouter attempts failed:",
-    lastError?.message || lastError
+    "All Gemini attempts failed:",
+    lastError?.message ||
+      lastError
   );
 
+  /*
+   * Return the actual Gemini error
+   * instead of showing an OpenRouter error.
+   */
+
   throw new Error(
-    "OpenRouter AI is temporarily unavailable. Please try again in a few moments."
+    lastError?.message ||
+      "Gemini AI is temporarily unavailable. Please try again in a few moments."
   );
 };
 
-export const analyzeProjectWithAI = async ({
-  title,
-  description,
-  requiredSkills = [],
-  projectType = "",
-}) => {
-  const prompt = `
+/* =========================================================
+   PROJECT ANALYSIS
+========================================================= */
+
+export const analyzeProjectWithAI =
+  async ({
+    title,
+    description,
+    requiredSkills = [],
+    projectType = "",
+  }) => {
+    const prompt = `
 You are an expert software project architect and team-building assistant.
 
 Analyze the following software project and provide practical recommendations.
 
-Project Title:
+PROJECT TITLE:
 ${title}
 
-Project Description:
+PROJECT DESCRIPTION:
 ${description}
 
-Required Skills:
+REQUIRED SKILLS:
 ${
   requiredSkills.length > 0
     ? requiredSkills.join(", ")
     : "Not specified"
 }
 
-Project Type:
+PROJECT TYPE:
 ${projectType || "Not specified"}
 
 Return a practical analysis.
 
-Rules:
+RULES:
+
 - Keep recommendations directly relevant to the project.
 - Do not suggest unnecessary technologies.
 - Recommend realistic team roles.
@@ -412,78 +471,122 @@ Rules:
 - Do not include explanations outside the JSON.
 `;
 
-  return await runWithFallback(
-    prompt,
-    projectAnalysisSchema
-  );
-};
-
-export const recommendTeamMembersWithAI = async ({
-  project,
-  members = [],
-}) => {
-  if (!project) {
-    throw new Error(
-      "Project information is required"
+    return await runWithFallback(
+      prompt,
+      projectAnalysisSchema
     );
-  }
+  };
 
-  if (
-    !Array.isArray(members) ||
-    members.length === 0
-  ) {
-    return {
-      recommendations: [],
-    };
-  }
+/* =========================================================
+   AI TEAM MEMBER RECOMMENDATIONS
+========================================================= */
 
-  const memberData = members.map((member) => ({
-    userId: member._id.toString(),
+export const recommendTeamMembersWithAI =
+  async ({
+    project,
+    members = [],
+  }) => {
+    if (!project) {
+      throw new Error(
+        "Project information is required."
+      );
+    }
 
-    name: member.name || "",
+    if (
+      !Array.isArray(members) ||
+      members.length === 0
+    ) {
+      return {
+        recommendations: [],
+      };
+    }
 
-    skills: Array.isArray(member.skills)
-      ? member.skills
-      : [],
+    /*
+     * Prepare candidate users.
+     *
+     * Only the information needed by AI
+     * is sent to Gemini.
+     */
 
-    bio: member.bio || "",
+    const memberData =
+      members.map((member) => ({
+        userId:
+          member?._id?.toString() || "",
 
-    branch: member.branch || "",
+        name:
+          member?.name || "",
 
-    year: member.year || "",
-  }));
+        skills:
+          Array.isArray(
+            member?.skills
+          )
+            ? member.skills
+            : [],
 
-  const prompt = `
+        bio:
+          member?.bio || "",
+
+        branch:
+          member?.branch || "",
+
+        year:
+          member?.year || "",
+      }));
+
+    const prompt = `
 You are an AI team-building assistant for a software collaboration platform.
 
 Your task is to find the best users for the project from the candidate list.
 
+==================================================
 PROJECT
+==================================================
 
 Title:
 ${project.title || "Not specified"}
 
 Description:
-${project.description || "Not specified"}
+${
+  project.description ||
+  "Not specified"
+}
 
 Required Skills:
 ${
-  Array.isArray(project.requiredSkills) &&
+  Array.isArray(
+    project.requiredSkills
+  ) &&
   project.requiredSkills.length > 0
-    ? project.requiredSkills.join(", ")
+    ? project.requiredSkills.join(
+        ", "
+      )
     : "Not specified"
 }
 
 Project Type:
-${project.projectType || "Not specified"}
+${
+  project.projectType ||
+  "Not specified"
+}
 
+==================================================
 CANDIDATE USERS
+==================================================
 
-${JSON.stringify(memberData, null, 2)}
+${JSON.stringify(
+  memberData,
+  null,
+  2
+)}
+
+==================================================
+TASK
+==================================================
 
 Analyze every candidate and recommend the users who are genuinely suitable for this project.
 
 Consider:
+
 - Direct skill matches.
 - Related or complementary technical skills.
 - Project requirements.
@@ -491,7 +594,10 @@ Consider:
 - Branch and academic year only when relevant.
 - Complementary skills that can strengthen the team.
 
-Important rules:
+==================================================
+IMPORTANT RULES
+==================================================
+
 - Only recommend users from the candidate list.
 - Use the exact userId provided in the candidate list.
 - Never invent a userId.
@@ -527,23 +633,30 @@ Use exactly this structure:
 }
 `;
 
-  const result =
-    await runWithFallback(
-      prompt,
-      teamRecommendationSchema
-    );
+    const result =
+      await runWithFallback(
+        prompt,
+        teamRecommendationSchema
+      );
 
-  if (
-    !result ||
-    !Array.isArray(result.recommendations)
-  ) {
+    if (
+      !result ||
+      !Array.isArray(
+        result.recommendations
+      )
+    ) {
+      return {
+        recommendations: [],
+      };
+    }
+
+    /*
+     * Keep only the top 10 results.
+     */
+
     return {
-      recommendations: [],
+      recommendations:
+        result.recommendations
+          .slice(0, 10),
     };
-  }
-
-  return {
-    recommendations:
-      result.recommendations.slice(0, 10),
   };
-};
